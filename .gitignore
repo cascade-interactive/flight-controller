@@ -1,0 +1,23 @@
+# Compilation outputs
+Debug/
+Release/
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.su
+*.d
+
+# CubeIDE local workspace settings
+.settings/
+. Edward/
+*.launch
+
+# Core project tracking definitions
+!/.project
+!/.cproject
+!/.gautobuild
+!/*.ioc
+!/Core/
+!/Drivers/
