@@ -15,6 +15,7 @@
 namespace ICM20602 {
 namespace Reg {
 inline constexpr uint8_t WHO_AM_I = 0x75;
+inline constexpr uint8_t WHO_AM_I_VALUE = 0x12;
 inline constexpr uint8_t CONFIG = 0x1A; // Page 36
 
 inline constexpr uint8_t GYRO_CONFIG = 0x1B;

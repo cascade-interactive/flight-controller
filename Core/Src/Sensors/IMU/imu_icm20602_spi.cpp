@@ -56,7 +56,7 @@ bool ICM20602_IMU::begin() {
     uint8_t who_am_i_val = 0;
 
     read_registers(ICM20602::Reg::WHO_AM_I, &who_am_i_val, 1);
-    if (who_am_i_val != 0x75) {
+    if (who_am_i_val != ICM20602::Reg::WHO_AM_I_VALUE) {
         return false; // Failed to communicate
     }
 
