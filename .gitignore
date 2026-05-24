@@ -13,6 +13,7 @@ Release/
 .settings/
 . Edward/
 *.launch
+*.vscode
 
 # Core project tracking definitions
 !/.project
