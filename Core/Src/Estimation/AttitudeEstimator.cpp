@@ -1,7 +1,8 @@
 /*
- * imu_icm20602_spi.hpp
+ * imu_icm20602_registers.hpp
  *
  *  Created on: May 23, 2026
  *      Author: Alexander
  */
-#pragma once
+
+#include "AttitudeEstimator.hpp"
