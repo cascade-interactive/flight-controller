@@ -43,8 +43,8 @@ HAL_StatusTypeDef ICM20602_IMU::read_registers(uint8_t reg_addr, uint8_t *p_buff
 
     select_cs();
 
-    status = HAL_SPI_Transmit(_hspi, &transmit_addr, 2, HAL_MAX_DELAY);
-    if (status = HAL_OK) {
+    status = HAL_SPI_Transmit(_hspi, &transmit_addr, 1, HAL_MAX_DELAY);
+    if (status == HAL_OK) {
         status = HAL_SPI_Receive(_hspi, p_buffer, size, HAL_MAX_DELAY);
     }
     deselect_cs();
