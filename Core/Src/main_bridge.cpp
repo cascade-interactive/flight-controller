@@ -15,6 +15,8 @@
 
 extern SPI_HandleTypeDef hspi1;
 
+enum class ImuDmaState { WaitAccel, WaitGyro };
+
 void flight_controller_run(void) {
     auto usb_print = [](const char *msg) {
         static char timestamped_msg[224];
@@ -48,29 +50,41 @@ void flight_controller_run(void) {
         usb_print("[     IMU     ] ERROR\r\n");
     }
 
-    while (1) {
-        if (imu_ok) {
-            imu.update_accel();
-            imu.update_gyro();
+    // DMA experiment
+    ImuDmaState imu_dma_state = ImuDmaState::WaitAccel;
 
-            char msg[160];
-            snprintf(msg,
-                     sizeof(msg),
-                     "[     IMU     ] A %.3f %.3f %.3f | G %.3f %.3f %.3f\r\n",
-                     static_cast<double>(imu.accel.x),
-                     static_cast<double>(imu.accel.y),
-                     static_cast<double>(imu.accel.z),
-                     static_cast<double>(imu.gyro.x),
-                     static_cast<double>(imu.gyro.y),
-                     static_cast<double>(imu.gyro.z));
-            usb_print(msg);
-        } else {
-            usb_print("[     SYS     ] TICK\r\n");
+    if (imu_ok) {
+        imu.start_accel_dma();
+    }
+
+    while (1) {
+        if (imu_ok && imu.dma_done()) {
+            if (imu_dma_state == ImuDmaState::WaitAccel) {
+                imu.parse_accel();
+                imu.start_gyro_dma();
+                imu_dma_state = ImuDmaState::WaitGyro;
+            } else {
+                imu.parse_gyro();
+
+                char msg[192];
+                snprintf(msg,
+                         sizeof(msg),
+                         "[IMU] A %.3f %.3f %.3f | G %.3f %.3f %.3f\r\n",
+                         static_cast<double>(imu.accel.x),
+                         static_cast<double>(imu.accel.y),
+                         static_cast<double>(imu.accel.z),
+                         static_cast<double>(imu.gyro.x),
+                         static_cast<double>(imu.gyro.y),
+                         static_cast<double>(imu.gyro.z));
+
+                usb_print(msg);
+
+                imu.start_accel_dma();
+
+                imu_dma_state = ImuDmaState::WaitAccel;
+            }
         }
 
-        osDelay(5);
+        osDelay(1);
     }
 }
-
-// [     IMU     ]
-// [     SYS     ]
