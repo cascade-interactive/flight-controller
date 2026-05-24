@@ -11,8 +11,12 @@
 #include "imu_icm20602_registers.hpp"
 #include "main.h"
 
-#ifndef INC_SENSORS_IMU_IMU_ICM20602_HPP_
-#define INC_SENSORS_IMU_IMU_ICM20602_HPP_
+struct ICM20602Sample {
+    CoreMath::Vector3 accel_g;
+    CoreMath::Vector3 gyro_rad_s;
+    uint32_t timestamp_us{0};
+    bool valid{false};
+};
 
 class ICM20602_IMU {
   private:
@@ -21,6 +25,7 @@ class ICM20602_IMU {
     uint16_t _cs_pin;
 
     uint8_t _raw_buffer[6];
+    uint8_t _raw_sample_buffer[14];
 
     void select_cs();
     void deselect_cs();
@@ -38,6 +43,10 @@ class ICM20602_IMU {
     uint8_t *_dma_user_buffer;
     uint16_t _dma_user_size;
 
+    volatile uint32_t _last_sample_timestamp_us;
+
+    ICM20602Sample parse_sample() const;
+
   public:
     CoreMath::Vector3 gyro;
     CoreMath::Vector3 accel;
@@ -52,10 +61,12 @@ class ICM20602_IMU {
     void on_spi_dma_complete(SPI_HandleTypeDef *hspi);
     bool dma_done() const;
 
+    HAL_StatusTypeDef start_sample_dma();
+    bool sample_ready() const;
+    ICM20602Sample consume_sample();
+
     HAL_StatusTypeDef start_accel_dma();
     HAL_StatusTypeDef start_gyro_dma();
     void parse_accel();
     void parse_gyro();
 };
-
-#endif /* INC_SENSORS_IMU_IMU_ICM20602_HPP_ */

@@ -6,6 +6,7 @@
  */
 
 #include "CoreMath.hpp"
+#include "Time.hpp"
 #include "imu_icm20602.hpp"
 #include "imu_icm20602_registers.hpp"
 
@@ -24,8 +25,17 @@ ICM20602_IMU::ICM20602_IMU(SPI_HandleTypeDef *hspi, GPIO_TypeDef *cs_port, uint1
     _dma_user_size = 0;
 
     // Clear on startup
+    _last_sample_timestamp_us = 0;
     gyro = Vector3::Zero();
     accel = Vector3::Zero();
+
+    for (uint8_t &byte : _raw_buffer) {
+        byte = 0;
+    }
+
+    for (uint8_t &byte : _raw_sample_buffer) {
+        byte = 0;
+    }
 }
 
 void ICM20602_IMU::select_cs() {
@@ -110,6 +120,8 @@ void ICM20602_IMU::on_spi_dma_complete(SPI_HandleTypeDef *hspi) {
 
     _dma_done = true;
     _dma_busy = false;
+
+    _last_sample_timestamp_us = Time::Micros();
 }
 
 bool ICM20602_IMU::dma_done() const {
@@ -122,6 +134,61 @@ HAL_StatusTypeDef ICM20602_IMU::start_accel_dma() {
 
 HAL_StatusTypeDef ICM20602_IMU::start_gyro_dma() {
     return read_registers_dma(ICM20602::Reg::GYRO_XOUT_H, _raw_buffer, 6);
+}
+
+/*
+Burst combined DMA IMU read starting at ACCEL_XOUT_H:
+
+ACCEL_XOUT_H/L
+ACCEL_YOUT_H/L
+ACCEL_ZOUT_H/L
+TEMP_OUT_H/L
+GYRO_XOUT_H/L
+GYRO_YOUT_H/L
+GYRO_ZOUT_H/L
+
+14 bytes total
+*/
+HAL_StatusTypeDef ICM20602_IMU::start_sample_dma() {
+    return read_registers_dma(ICM20602::Reg::ACCEL_XOUT_H, _raw_sample_buffer, 14);
+}
+
+ICM20602Sample ICM20602_IMU::consume_sample() {
+    if (!_dma_done) {
+        return {};
+    }
+
+    ICM20602Sample sample = parse_sample();
+    _dma_done = false;
+    return sample;
+}
+
+bool ICM20602_IMU::sample_ready() const {
+    return _dma_done;
+}
+
+ICM20602Sample ICM20602_IMU::parse_sample() const {
+    ICM20602Sample sample{};
+
+    int16_t raw_ax = static_cast<int16_t>((_raw_sample_buffer[0] << 8) | _raw_sample_buffer[1]);
+    int16_t raw_ay = static_cast<int16_t>((_raw_sample_buffer[2] << 8) | _raw_sample_buffer[3]);
+    int16_t raw_az = static_cast<int16_t>((_raw_sample_buffer[4] << 8) | _raw_sample_buffer[5]);
+
+    int16_t raw_gx = static_cast<int16_t>((_raw_sample_buffer[8] << 8) | _raw_sample_buffer[9]);
+    int16_t raw_gy = static_cast<int16_t>((_raw_sample_buffer[10] << 8) | _raw_sample_buffer[11]);
+    int16_t raw_gz = static_cast<int16_t>((_raw_sample_buffer[12] << 8) | _raw_sample_buffer[13]);
+
+    sample.accel_g =
+        CoreMath::Vector3(static_cast<float>(raw_ax) / 16384.0f, static_cast<float>(raw_ay) / 16384.0f, static_cast<float>(raw_az) / 16384.0f);
+
+    sample.gyro_rad_s = CoreMath::Vector3((static_cast<float>(raw_gx) / 131.0f) * CoreMath::DegToRad,
+                                          (static_cast<float>(raw_gy) / 131.0f) * CoreMath::DegToRad,
+                                          (static_cast<float>(raw_gz) / 131.0f) * CoreMath::DegToRad);
+
+    sample.timestamp_us = _last_sample_timestamp_us;
+    sample.valid = true;
+
+    return sample;
 }
 
 void ICM20602_IMU::parse_accel() {
