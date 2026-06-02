@@ -1,67 +1,96 @@
 # STM32 Flight Controller
 
-Custom flight-controller firmware for an STM32G474CEU6-based quadcopter, with the near-term goal of stable hover and the longer-term goal of becoming a small autonomy platform.
+The main purpose of this project were mainly to teach myself how exactly real-time embedded systems such as drones work. That's why I stayed away from using LLMs for even trivial tasks. This forced me to understand concepts such as how an EKF works, how to implement a cascaded PID loop and much more. Some of the ressources that have helped me the most I will link here:
 
-This repo is currently in hardware bring-up and sensor/estimator development.
+* Joan Solà — Quaternion kinematics for the ESKF
+* Estimation for Quadrotors (Tellex et al.)
 
 ## Current Status
 
-- STM32G474CEU6 project generated with CubeMX
-- FreeRTOS enabled for task scheduling
-- USB CDC serial debug output working
-- C/C++ bridge in place for flight-controller logic
-- ICM-20602 SPI communication working
-- ICM-20602 `WHO_AM_I` check working
-- Accelerometer and gyroscope burst reads implemented
-- Experimental non-blocking SPI DMA read path in progress
-- Basic vector and quaternion math utilities started
-- Attitude estimator started, not yet implemented
+At the moment the project is still mainly in the bring-up and estimator development phase.
 
-## Hardware Target
+Currently working:
 
-| Component | Role | Interface | Status |
-| --- | --- | --- | --- |
-| STM32G474CEU6 | Main MCU, 170 MHz Cortex-M4F with FPU | - | Project target |
-| ICM-20602 | 6-axis IMU, accel + gyro | SPI | Bring-up in progress |
-| VL53L1X | Time-of-flight range sensor for altitude hold | I2C | Planned |
-| PMW3901 | Optical-flow sensor for horizontal hold | SPI | Planned |
-| Raspberry Pi 5 | Higher-level autonomy companion computer | UART | Planned |
+* STM32 project generated using CubeMX
+* FreeRTOS task scheduling
+* USB CDC serial debug output
+* C/C++ bridge for flight-controller code
+* ICM-20602 SPI communication
+* ICM-20602 `WHO_AM_I` validation
+* Accelerometer burst reads
+* Gyroscope burst reads
+* Basic vector math utilities
+* Basic quaternion math utilities
 
-The STM32G474 was chosen for its FPU and for the CORDIC/FMAC accelerators, which should be useful later for estimator and control-loop math.
+Currently in progress:
+
+* SPI DMA reads
+* Sensor calibration
+* Attitude estimation
+
+One thing I was pretty happy about recently was finally getting some EKF unit tests passing. Up until now most debugging was basically flashing firmware, opening a serial terminal and hoping for the best. I integrated Google Test and wrote a few basic tests to validate estimator behavior. Currently the tests verify that the filter starts at the identity quaternion, remains normalized and doesn't produce NaNs under simple conditions. Nothing crazy yet, but it was nice to finally have some automated validation instead of relying entirely on hardware testing.
+
+## Hardware
+
+| Component      | Role                        | Interface | Status         |
+| -------------- | --------------------------- | --------- | -------------- |
+| STM32F4        | Main MCU                    | -         | Current target |
+| ICM-20602      | 6-axis IMU                  | SPI       | Working        |
+| VL53L1X        | Time-of-flight range sensor | I2C       | Planned        |
+| PMW3901        | Optical-flow sensor         | SPI       | Planned        |
+| Raspberry Pi 5 | Higher-level autonomy       | UART      | Planned        |
+
+The project originally started on an STM32G474. I picked it because of the FPU as well as the CORDIC and FMAC accelerators which seemed pretty useful for estimator and control-loop math. Later on I decided that I wanted to design my own PCB for this project and eventually assemble it myself. At that point the G4 started becoming a little difficult to justify from a cost perspective, so I switched over to an STM32F4 instead.
 
 ## Firmware Structure
 
-The generated CubeMX files remain in place for MCU startup, HAL setup, USB, and FreeRTOS integration. The flight-controller logic is kept separate from that generated code where possible.
+The CubeMX-generated files are mostly left alone and handle startup, peripheral initialization, USB and FreeRTOS setup.
+
+Most flight-controller-specific code lives separately from the generated code where possible.
+
+Current modules include:
+
+* IMU drivers
+* Math utilities
+* State estimation
+* Control infrastructure
+* Communication interfaces
 
 ## ICM-20602
 
-The IMU driver currently handles:
+The IMU driver currently supports:
 
-- Manual chip-select control
-- Register writes over SPI
-- Single and burst register reads over SPI
-- `WHO_AM_I` validation
-- I2C interface disable
-- Gyro full-scale setup at +/-250 dps
-- Accelerometer full-scale setup at +/-2g
-- Raw accel/gyro conversion into physical units
-- Experimental SPI transmit/receive DMA reads
+* Manual chip-select control
+* SPI register writes
+* Single-register reads
+* Burst-register reads
+* `WHO_AM_I` validation
+* I2C interface disable
+* Accelerometer configuration
+* Gyroscope configuration
+* Conversion from raw sensor values into physical units
+* Experimental DMA-based reads
 
-The DMA path is still being worked through. The current loop alternates between accel and gyro DMA reads, parses the completed transfer, and prints the values over USB CDC for debug.
+The current debug loop alternates between accelerometer and gyroscope DMA reads, parses the completed transfer and streams the values over USB CDC.
+
+The ICM-20602 was mainly chosen because it is simple and relatively common. Long term I'd like to switch to an IMU that includes a magnetometer, but while debugging SPI communication, calibration and estimation code I figured having fewer things that can go wrong was probably a good thing.
 
 ## Goals
 
 ### Current
 
-- Finish robust SPI and I2C sensor drivers
-- Complete ICM-20602 bring-up and calibration
-- Add VL53L1X ranging
-- Add PMW3901 optical-flow reads
-- Implement attitude estimation
-- Reach stable hover
+* Finish SPI and I2C sensor drivers
+* Complete IMU calibration
+* Add VL53L1X support
+* Add PMW3901 support
+* Implement attitude estimation
+* Implement cascaded PID control
+* Reach stable hover
 
 ### Planned
 
-- Position hold using optical flow and ToF
-- UART link to Raspberry Pi 5 for higher-level autonomy
-- Waypoint navigation
+* Position hold using optical flow and ToF
+* UART link to a Raspberry Pi 5
+* Waypoint navigation
+* Basic autonomous flight capabilities
+* Custom flight-controller PCB

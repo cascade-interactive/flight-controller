@@ -6,6 +6,7 @@
  */
 
 #include "main_bridge.h"
+#include "AttitudeEstimator.hpp"
 #include "CoreMath.hpp"
 #include "Time.hpp"
 #include "cmsis_os.h"
@@ -22,6 +23,9 @@ void flight_controller_run(void) {
     // Initialize the IMU
     ICM20602_IMU imu(&hspi1, SPI1_IMU_CS_GPIO_Port, SPI1_IMU_CS_Pin);
     bool imu_ok = imu.begin();
+
+    // Initialize the Estimator
+    // AttitudeEstimator estimator;
 
     uint32_t previous_timestamp_us = 0U;
     bool imu_dma_active = false;
