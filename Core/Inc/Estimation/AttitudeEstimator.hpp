@@ -10,17 +10,30 @@
 
 class AttitudeEstimator {
   public:
-    AttitudeEstimator() = default;
+    AttitudeEstimator();
 
     // Input
     void update(CoreMath::Vector3 gyro_rad_s, CoreMath::Vector3 accel_g, float dt_s);
 
     // Output
-    CoreMath::Vector3 get_euler_attitude() const;
+    CoreMath::Quaternion getAttitude() const;
+    CoreMath::Vector3 getEuler() const;
 
   private:
     // State
-    CoreMath::Quaternion current_attitude{CoreMath::Quaternion::Identity()};
+    CoreMath::Quaternion current_attitude_{CoreMath::Quaternion::Identity()};
 
-    // TODO: Covariance matrices for EKF
+    // Covariance
+    float P_[3][3];
+
+    // Process Noise
+    float Q_[3][3];
+
+    // Measurement Noise
+    float R_[3][3];
+
+    // Steps
+    void predict(const CoreMath::Vector3 &gyro_rad_s, float dt_s);
+    void updateAccel(const CoreMath::Vector3 &accel_g);
+    void normalizeAttitude();
 };
