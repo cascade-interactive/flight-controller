@@ -382,4 +382,10 @@ struct Quaternion {
 
     return euler;
 }
+
+[[nodiscard]] inline Vector3 RotateVector(const Quaternion &q, const Vector3 &v) {
+    Quaternion pure(0.0f, v.x, v.y, v.z);
+    Quaternion rotated = q * pure * q.Conjugate();
+    return Vector3(rotated.x, rotated.y, rotated.z);
+}
 } // namespace CoreMath
