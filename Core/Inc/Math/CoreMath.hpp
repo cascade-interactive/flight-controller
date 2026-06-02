@@ -217,6 +217,53 @@ struct Vector3 {
 }
 
 // ------------------------------
+// "The Matrix"
+// ------------------------------
+
+// TODO: Add comments
+struct Matrix3 {
+    float m[3][3]{};
+
+    inline Matrix3() : m{} {
+    }
+
+    [[nodiscard]] inline static Matrix3 Identity() {
+        Matrix3 result;
+        result.m[0][0] = 1.0f;
+        result.m[1][1] = 1.0f;
+        result.m[2][2] = 1.0f;
+        return result;
+    }
+
+    [[nodiscard]] inline static Matrix3 Zero() {
+        return Matrix3();
+    }
+
+    [[nodiscard]] inline Matrix3 operator*(const Matrix3 &other) const {
+        Matrix3 result;
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                for (int k = 0; k < 3; k++)
+                    result.m[i][j] += m[i][k] * other.m[k][j];
+        return result;
+    }
+
+    [[nodiscard]] inline Vector3 operator*(const Vector3 &v) const {
+        return Vector3(m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z,
+                       m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z,
+                       m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z);
+    }
+
+    [[nodiscard]] inline Matrix3 Transpose() const {
+        Matrix3 result;
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 3; j++)
+                result.m[i][j] = m[j][i];
+        return result;
+    }
+};
+
+// ------------------------------
 // Quaternion
 // ------------------------------
 
