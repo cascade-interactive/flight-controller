@@ -1,6 +1,10 @@
-# Compilation outputs
+```gitignore
+# Build outputs
 Debug/
 Release/
+build/
+
+# Compiled object files
 *.elf
 *.bin
 *.hex
@@ -9,16 +13,18 @@ Release/
 *.su
 *.d
 
-# CubeIDE local workspace settings
+# CubeIDE local settings
 .settings/
-. Edward/
 *.launch
-*.vscode
 
-# Core project tracking definitions
+# VSCode local settings
+.vscode/
+
+# Core project files (tracked)
 !/.project
 !/.cproject
 !/.gautobuild
 !/*.ioc
 !/Core/
 !/Drivers/
+```
