@@ -1,0 +1,9 @@
+#!/bin/sh
+# Regenerate the pinout diagram + README table whenever the .ioc is part of the commit.
+# Enable with: git config core.hooksPath .githooks
+
+if git diff --cached --name-only | grep -q '^firmware/.*\.ioc$'; then
+    echo "pre-commit: .ioc changed, regenerating pinout..."
+    python tools/pinout/generate_pinout.py || exit 1
+    git add documentation/pinout.svg README.md
+fi

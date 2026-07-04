@@ -1,30 +1,12 @@
-```gitignore
-# Build outputs
-Debug/
-Release/
-build/
+# STM32CubeIDE build output
+firmware/Debug/
+firmware/Release/
+firmware/build/
 
-# Compiled object files
-*.elf
-*.bin
-*.hex
-*.map
-*.o
-*.su
-*.d
-
-# CubeIDE local settings
-.settings/
-*.launch
-
-# VSCode local settings
+# Editor/IDE noise
 .vscode/
+*.swp
 
-# Core project files (tracked)
-!/.project
-!/.cproject
-!/.gautobuild
-!/*.ioc
-!/Core/
-!/Drivers/
-```
+# Python
+__pycache__/
+*.pyc
