@@ -59,20 +59,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_STATUS_Pin GPIO_PIN_13
-#define LED_STATUS_GPIO_Port GPIOC
-#define LED_ERROR_Pin GPIO_PIN_14
-#define LED_ERROR_GPIO_Port GPIOC
-#define LED_ACTIVITY_Pin GPIO_PIN_15
-#define LED_ACTIVITY_GPIO_Port GPIOC
+#define ESC_TELEM_Pin GPIO_PIN_0
+#define ESC_TELEM_GPIO_Port GPIOC
+#define SERV_1_Pin GPIO_PIN_2
+#define SERV_1_GPIO_Port GPIOC
+#define SERV_2_Pin GPIO_PIN_3
+#define SERV_2_GPIO_Port GPIOC
 #define V_SENSE_Pin GPIO_PIN_0
 #define V_SENSE_GPIO_Port GPIOA
-#define PWM_LED1_Pin GPIO_PIN_1
-#define PWM_LED1_GPIO_Port GPIOA
+#define PWM_1_Pin GPIO_PIN_1
+#define PWM_1_GPIO_Port GPIOA
 #define CUR_SENSE_Pin GPIO_PIN_4
 #define CUR_SENSE_GPIO_Port GPIOA
-#define PWM_LED2_Pin GPIO_PIN_5
-#define PWM_LED2_GPIO_Port GPIOA
+#define PWM_2_Pin GPIO_PIN_5
+#define PWM_2_GPIO_Port GPIOA
 #define MOTOR_CH1_Pin GPIO_PIN_6
 #define MOTOR_CH1_GPIO_Port GPIOA
 #define MOTOR_CH2_Pin GPIO_PIN_7
@@ -85,8 +85,15 @@ void Error_Handler(void);
 #define SPI1_INT_GPIO_Port GPIOB
 #define SPI2_CS_Pin GPIO_PIN_12
 #define SPI2_CS_GPIO_Port GPIOB
+#define LED_STATUS_Pin GPIO_PIN_7
+#define LED_STATUS_GPIO_Port GPIOC
 #define SPI2_INT_Pin GPIO_PIN_8
-#define SPI2_INT_GPIO_Port GPIOA
+#define SPI2_INT_GPIO_Port GPIOC
+#define SPI2_INT_EXTI_IRQn EXTI9_5_IRQn
+#define LED_ACTIVITY_Pin GPIO_PIN_9
+#define LED_ACTIVITY_GPIO_Port GPIOC
+#define LED_ERROR_Pin GPIO_PIN_8
+#define LED_ERROR_GPIO_Port GPIOA
 #define FSYNC_Pin GPIO_PIN_9
 #define FSYNC_GPIO_Port GPIOA
 #define XSHUT_Pin GPIO_PIN_10
