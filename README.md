@@ -116,6 +116,7 @@ The STM32G474RE LQFP64 diagram and table below are generated automatically from 
 | PB6 | `GPIO_Output` | SPI1_CS | SPI1 · EXT |
 | PB7 | `I2C1_SDA` | I2C1_SDA | I2C1 · TOF |
 | PB8 | `-` | BOOT0 | System |
+| PB9 | `FDCAN1_TX` | FDCAN1_TX | Other |
 | PB10 | `USART3_TX` | USART3_TX | USART3 |
 | PB11 | `USART3_RX` | USART3_RX | USART3 |
 | PB12 | `GPIO_Output` | SPI2_CS | SPI2 · IMU |
