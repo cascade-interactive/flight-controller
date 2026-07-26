@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32g4xx_hal.h"
+#include "stm32h7xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -59,47 +59,84 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define ESC_TELEM_Pin GPIO_PIN_0
-#define ESC_TELEM_GPIO_Port GPIOC
-#define SERV_1_Pin GPIO_PIN_2
-#define SERV_1_GPIO_Port GPIOC
-#define SERV_2_Pin GPIO_PIN_3
-#define SERV_2_GPIO_Port GPIOC
-#define V_SENSE_Pin GPIO_PIN_0
-#define V_SENSE_GPIO_Port GPIOA
-#define PWM_1_Pin GPIO_PIN_1
-#define PWM_1_GPIO_Port GPIOA
-#define CUR_SENSE_Pin GPIO_PIN_4
-#define CUR_SENSE_GPIO_Port GPIOA
-#define PWM_2_Pin GPIO_PIN_5
-#define PWM_2_GPIO_Port GPIOA
-#define MOTOR_CH1_Pin GPIO_PIN_6
-#define MOTOR_CH1_GPIO_Port GPIOA
-#define MOTOR_CH2_Pin GPIO_PIN_7
-#define MOTOR_CH2_GPIO_Port GPIOA
-#define MOTOR_CH3_Pin GPIO_PIN_0
-#define MOTOR_CH3_GPIO_Port GPIOB
-#define MOTOR_CH4_Pin GPIO_PIN_1
-#define MOTOR_CH4_GPIO_Port GPIOB
-#define SPI1_INT_Pin GPIO_PIN_2
-#define SPI1_INT_GPIO_Port GPIOB
-#define SPI2_CS_Pin GPIO_PIN_12
-#define SPI2_CS_GPIO_Port GPIOB
-#define LED_STATUS_Pin GPIO_PIN_7
-#define LED_STATUS_GPIO_Port GPIOC
-#define SPI2_INT_Pin GPIO_PIN_8
-#define SPI2_INT_GPIO_Port GPIOC
-#define SPI2_INT_EXTI_IRQn EXTI9_5_IRQn
-#define LED_ACTIVITY_Pin GPIO_PIN_9
-#define LED_ACTIVITY_GPIO_Port GPIOC
-#define LED_ERROR_Pin GPIO_PIN_8
-#define LED_ERROR_GPIO_Port GPIOA
-#define FSYNC_Pin GPIO_PIN_9
-#define FSYNC_GPIO_Port GPIOA
-#define XSHUT_Pin GPIO_PIN_10
-#define XSHUT_GPIO_Port GPIOC
-#define SPI1_CS_Pin GPIO_PIN_6
-#define SPI1_CS_GPIO_Port GPIOB
+#define LED_1_Pin GPIO_PIN_2
+#define LED_1_GPIO_Port GPIOE
+#define LED_2_Pin GPIO_PIN_3
+#define LED_2_GPIO_Port GPIOE
+#define LED_3_Pin GPIO_PIN_4
+#define LED_3_GPIO_Port GPIOE
+#define EXPOSED_E5_Pin GPIO_PIN_5
+#define EXPOSED_E5_GPIO_Port GPIOE
+#define EXPOSED_E6_Pin GPIO_PIN_6
+#define EXPOSED_E6_GPIO_Port GPIOE
+#define ESC_C_Pin GPIO_PIN_0
+#define ESC_C_GPIO_Port GPIOC
+#define M_1_Pin GPIO_PIN_0
+#define M_1_GPIO_Port GPIOA
+#define M_2_Pin GPIO_PIN_1
+#define M_2_GPIO_Port GPIOA
+#define M_3_Pin GPIO_PIN_2
+#define M_3_GPIO_Port GPIOA
+#define M_4_Pin GPIO_PIN_3
+#define M_4_GPIO_Port GPIOA
+#define BARO_INT_Pin GPIO_PIN_4
+#define BARO_INT_GPIO_Port GPIOA
+#define ESC_V_Pin GPIO_PIN_4
+#define ESC_V_GPIO_Port GPIOC
+#define BARO_CS_Pin GPIO_PIN_5
+#define BARO_CS_GPIO_Port GPIOC
+#define AUX_L3_Pin GPIO_PIN_0
+#define AUX_L3_GPIO_Port GPIOB
+#define AUX_L4_Pin GPIO_PIN_1
+#define AUX_L4_GPIO_Port GPIOB
+#define FLASH_CS_Pin GPIO_PIN_2
+#define FLASH_CS_GPIO_Port GPIOB
+#define ESC_TELEM_Pin GPIO_PIN_7
+#define ESC_TELEM_GPIO_Port GPIOE
+#define EXPOSED_UART7_TX_Pin GPIO_PIN_8
+#define EXPOSED_UART7_TX_GPIO_Port GPIOE
+#define M_5_Pin GPIO_PIN_9
+#define M_5_GPIO_Port GPIOE
+#define M_6_Pin GPIO_PIN_11
+#define M_6_GPIO_Port GPIOE
+#define M_7_Pin GPIO_PIN_13
+#define M_7_GPIO_Port GPIOE
+#define M_8_Pin GPIO_PIN_14
+#define M_8_GPIO_Port GPIOE
+#define IMU_CS_Pin GPIO_PIN_12
+#define IMU_CS_GPIO_Port GPIOB
+#define IMU_SCK_Pin GPIO_PIN_13
+#define IMU_SCK_GPIO_Port GPIOB
+#define IMU_MISO_Pin GPIO_PIN_14
+#define IMU_MISO_GPIO_Port GPIOB
+#define IMU_MOSI_Pin GPIO_PIN_15
+#define IMU_MOSI_GPIO_Port GPIOB
+#define IMU_INT_Pin GPIO_PIN_8
+#define IMU_INT_GPIO_Port GPIOD
+#define IMU_FSYNC_Pin GPIO_PIN_9
+#define IMU_FSYNC_GPIO_Port GPIOD
+#define AUX_L1_Pin GPIO_PIN_12
+#define AUX_L1_GPIO_Port GPIOD
+#define AUX_L2_Pin GPIO_PIN_13
+#define AUX_L2_GPIO_Port GPIOD
+#define BUZZER_Pin GPIO_PIN_6
+#define BUZZER_GPIO_Port GPIOC
+#define SDMMC1_DETECT_Pin GPIO_PIN_8
+#define SDMMC1_DETECT_GPIO_Port GPIOA
+#define COMPANION_CTS_Pin GPIO_PIN_3
+#define COMPANION_CTS_GPIO_Port GPIOD
+#define COMPANION_RTS_Pin GPIO_PIN_4
+#define COMPANION_RTS_GPIO_Port GPIOD
+#define COMPANION_TX_Pin GPIO_PIN_5
+#define COMPANION_TX_GPIO_Port GPIOD
+#define COMPANION_RX_Pin GPIO_PIN_6
+#define COMPANION_RX_GPIO_Port GPIOD
+#define SYNC_Pin GPIO_PIN_7
+#define SYNC_GPIO_Port GPIOD
+#define AUX_S1_Pin GPIO_PIN_4
+#define AUX_S1_GPIO_Port GPIOB
+#define AUX_S2_Pin GPIO_PIN_5
+#define AUX_S2_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

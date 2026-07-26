@@ -11,5 +11,8 @@ firmware/build/
 __pycache__/
 *.pyc
 
+# Design notes
+documentation/notes/
+
 # Other stuff
 Proposals and Information/

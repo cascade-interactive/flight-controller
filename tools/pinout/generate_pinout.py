@@ -36,6 +36,14 @@ LAYOUTS = {
         "right": ["VDD", "VSS", "PA12", "PA11", "PA10", "PA9", "PA8", "PC9", "PC8", "PC7", "PC6", "PB15", "PB14", "PB13", "PB12", "PB11"],
         "top": ["VDD", "VSS", "PB9", "PB8", "PB7", "PB6", "PB5", "PB4", "PB3", "PD2", "PC12", "PC11", "PC10", "PA15", "PA14", "PA13"],
     },
+    # STM32H743VITx, DS12110 Figure 3. Note PC2_C/PC3_C are the analog-switch pins,
+    # not ordinary GPIO, and VCAP1/VCAP2 sit at pins 48 and 73.
+    "LQFP100": {
+        "left": ["PE2", "PE3", "PE4", "PE5", "PE6", "VBAT", "PC13", "PC14", "PC15", "VSS", "VDD", "PH0", "PH1", "NRST", "PC0", "PC1", "PC2_C", "PC3_C", "VSSA", "VREF+", "VDDA", "PA0", "PA1", "PA2", "PA3"],
+        "bottom": ["VSS", "VDD", "PA4", "PA5", "PA6", "PA7", "PC4", "PC5", "PB0", "PB1", "PB2", "PE7", "PE8", "PE9", "PE10", "PE11", "PE12", "PE13", "PE14", "PE15", "PB10", "PB11", "VCAP1", "VSS", "VDD"],
+        "right": ["VDD", "VSS", "VCAP2", "PA13", "PA12", "PA11", "PA10", "PA9", "PA8", "PC9", "PC8", "PC7", "PC6", "PD15", "PD14", "PD13", "PD12", "PD11", "PD10", "PD9", "PD8", "PB15", "PB14", "PB13", "PB12"],
+        "top": ["VDD", "VSS", "PE1", "PE0", "PB9", "PB8", "BOOT0", "PB7", "PB6", "PB5", "PB4", "PB3", "PD7", "PD6", "PD5", "PD4", "PD3", "PD2", "PD1", "PD0", "PC12", "PC11", "PC10", "PA15", "PA14"],
+    },
 }
 
 IOC_ALIASES = {
@@ -44,39 +52,53 @@ IOC_ALIASES = {
     "PF0": "PF0-OSC_IN",
     "PF1": "PF1-OSC_OUT",
     "PG10": "PG10-NRST",
+    "PH0": "PH0-OSC_IN",
+    "PH1": "PH1-OSC_OUT",
 }
 
-POWER_PINS = {"VBAT", "VDD", "VDDA", "VREF+", "VSS", "VSSA"}
+POWER_PINS = {"VBAT", "VCAP1", "VCAP2", "VDD", "VDDA", "VREF+", "VSS", "VSSA"}
 
 # Fixed system roles shown even when the pin carries no .ioc signal.
-SYSTEM_ROLES = {"PG10": "NRST", "PB8": "BOOT0"}
+SYSTEM_ROLES = {"PG10": "NRST", "NRST": "NRST", "BOOT0": "BOOT0"}
 
 # Bus groups: id -> (legend text, signal prefixes, label names/prefixes)
 GROUPS = [
-    ("spi1", "SPI1 · EXT", ("SPI1_",), ("SPI1_CS", "SPI1_INT")),
-    ("spi2", "SPI2 · IMU", ("SPI2_",), ("SPI2_CS", "SPI2_INT", "FSYNC")),
-    ("i2c1", "I2C1 · TOF", ("I2C1_",), ("XSHUT",)),
-    ("motor", "MOTORS · TIM3", ("S_TIM3_",), ("MOTOR_",)),
-    ("servo", "SERVOS · TIM1", ("S_TIM1_",), ("SERV_",)),
-    ("pwm", "PWM · TIM2", ("S_TIM2_",), ("PWM_",)),
-    ("usb", "USB", ("USB_",), ()),
-    ("swd", "SWD", ("SYS_JT",), ()),
+    ("imu", "SPI2 · IMU", ("SPI2_",), ("IMU_",)),
+    ("spi1", "SPI1 · BARO/FLASH", ("SPI1_",), ("BARO_", "FLASH_")),
+    ("sdmmc", "SDMMC1 · SD CARD", ("SDMMC1_",), ("SDMMC1_",)),
+    ("motor", "MOTORS · TIM5/TIM1", ("S_TIM5_", "S_TIM1_"), ("M_",)),
+    ("aux", "AUX · TIM3/TIM4", ("S_TIM3_", "S_TIM4_"), ("AUX_",)),
+    ("buzzer", "BUZZER · TIM8", ("S_TIM8_",), ("BUZZER",)),
+    ("i2c1", "I2C1", ("I2C1_",), ()),
+    ("fdcan", "FDCAN1", ("FDCAN1_",), ()),
+    ("usb", "USB OTG FS", ("USB_OTG_FS_",), ()),
+    ("swd", "SWD", ("DEBUG_JT",), ()),
+    ("companion", "USART2 · COMPANION", ("USART2_",), ("COMPANION_",)),
     ("usart1", "USART1", ("USART1_",), ()),
-    ("usart2", "USART2", ("USART2_",), ()),
     ("usart3", "USART3", ("USART3_",), ()),
-    ("lpuart", "LPUART1", ("LPUART1_",), ()),
-    ("uart5", "UART5", ("UART5_",), ()),
+    ("uart7", "UART7 · ESC TELEM", ("UART7_",), ("ESC_TELEM",)),
+    ("uart8", "UART8", ("UART8_",), ()),
     ("leds", "LEDS", (), ("LED_",)),
-    ("analog", "ANALOG", ("ADC",), ("V_SENSE", "CUR_SENSE")),
+    ("analog", "ANALOG", ("ADC",), ("ESC_V", "ESC_C")),
+    ("gpio", "GPIO · EXPOSED", (), ("EXPOSED_", "SYNC")),
 ]
 
-DISPLAY_SIGNAL = {"SYS_JTMS-SWDIO": "SYS_SWDIO", "SYS_JTCK-SWCLK": "SYS_SWCLK"}
+DISPLAY_SIGNAL = {
+    "SYS_JTMS-SWDIO": "SYS_SWDIO",
+    "SYS_JTCK-SWCLK": "SYS_SWCLK",
+    "DEBUG_JTMS-SWDIO": "SWDIO",
+    "DEBUG_JTCK-SWCLK": "SWCLK",
+    "DEBUG_JTDO-SWO": "SWO",
+}
 
 
 def parse_ioc(path: Path) -> dict[str, dict[str, str]]:
     """Return {ioc_pin_name: {Signal:…, GPIO_Label:…, Mode:…}}."""
     pins: dict[str, dict[str, str]] = {}
-    pat = re.compile(r"^(P[A-G]\d+(?:-[A-Z0-9_]+)?)\.(Signal|GPIO_Label|Mode)=(.*)$")
+    # Port H exists on the H7 packages, and CubeMX writes some keys with an
+    # escaped space and a parenthesised hint (PA13\ (JTMS/SWDIO), PH0-OSC_IN\ (PH0));
+    # that suffix is dropped so the remainder matches a pad name or an IOC_ALIASES key.
+    pat = re.compile(r"^(P[A-H]\d+(?:-[A-Z0-9_]+)?)(?:\\?\s*\([^)]*\))?\.(Signal|GPIO_Label|Mode)=(.*)$")
     for line in path.read_text(encoding="utf-8").splitlines():
         m = pat.match(line.strip())
         if m:
@@ -132,21 +154,24 @@ def load_pins(ioc: Path, package: str):
 # job instead. Everything must stay readable on GitHub light AND dark themes:
 # no currentColor, no near-black or near-white text, only mid-tone colours.
 GROUP_COLORS = {
+    "imu": "#D63A4E",
     "spi1": "#E0812F",
-    "spi2": "#D63A4E",
-    "i2c1": "#A06BDB",
+    "sdmmc": "#C58B2A",
     "motor": "#35A45F",
-    "servo": "#BF5AF2",
-    "pwm": "#C58B2A",
+    "aux": "#BF5AF2",
+    "buzzer": "#D8A32B",
+    "i2c1": "#A06BDB",
+    "fdcan": "#E26D5A",
     "usb": "#D059A8",
     "swd": "#8B95A5",
+    "companion": "#16A8A0",
     "usart1": "#3E8FD9",
-    "usart2": "#16A8A0",
     "usart3": "#6D7FE0",
-    "lpuart": "#2FB0C7",
-    "uart5": "#E26D5A",
+    "uart7": "#B5703A",
+    "uart8": "#2FB0C7",
     "leds": "#A98514",
     "analog": "#66892B",
+    "gpio": "#909AA6",
     "other": "#7D8590",
 }
 
@@ -209,8 +234,14 @@ def pad_svg(side: str, idx: int, pin: dict, body_x: float, body_y: float, body_s
 def build_svg(pins: dict, mcu_name: str, package: str) -> str:
     side_count = max(idx for _side, idx in pins) + 1
     body_size = side_count * 20 + 20
+    # Pad (42) plus the gap plus room for the longest rotated signal label. The
+    # canvas grows with the package instead of being fixed, otherwise the top and
+    # bottom labels fall outside the viewBox once a side gets past ~20 pins.
+    margin = 160
+    view_height = body_size + 2 * margin
     body_x = 450 - body_size / 2
-    body_y = 320 - body_size / 2
+    body_y = margin
+    center_y = body_y + body_size / 2
 
     plain, grouped = [], {}
     for (side, idx), pin in sorted(pins.items()):
@@ -234,15 +265,15 @@ def build_svg(pins: dict, mcu_name: str, package: str) -> str:
         groups_svg.append(f'<g class="grp g-{gid}" data-g="{gid}">{"".join(grouped[gid])}{legend}</g>')
         legend_y += 21.5
 
-    return f"""<svg id="pinmap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {view_width} 600" role="img" aria-label="{mcu_name} {package} pinout, colour-coded by bus.">
+    return f"""<svg id="pinmap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {view_width} {view_height}" role="img" aria-label="{mcu_name} {package} pinout, colour-coded by bus.">
 <style>
 {build_style()}
 </style>
 <!-- chip body -->
 <rect x="{body_x}" y="{body_y}" width="{body_size}" height="{body_size}" rx="14" fill="#14181F" stroke="#7D8590" stroke-opacity=".35"/>
 <circle cx="{body_x + 22}" cy="{body_y + 22}" r="4.5" fill="none" stroke="#6E7681" stroke-width="1.5"/>
-<text class="chip-name" x="450" y="318" text-anchor="middle">{mcu_name}</text>
-<text class="chip-pkg" x="450" y="342" text-anchor="middle">{package}</text>
+<text class="chip-name" x="450" y="{center_y - 2}" text-anchor="middle">{mcu_name}</text>
+<text class="chip-pkg" x="450" y="{center_y + 22}" text-anchor="middle">{package}</text>
 <g>{"".join(plain)}</g>
 <g class="pins">
 {chr(10).join(groups_svg)}
@@ -258,7 +289,7 @@ def build_table(pins: dict) -> str:
     titles.update({"pwr": "Power", "sys": "System", "other": "Other"})
 
     def port_key(p):
-        m = re.match(r"P([A-G])(\d+)", p["name"])
+        m = re.match(r"P([A-H])(\d+)", p["name"])
         return (m.group(1), int(m.group(2))) if m else ("Z", 0)
 
     rows = []
@@ -307,8 +338,8 @@ def main() -> int:
     content = ioc.read_text(encoding="utf-8")
     mcu = re.search(r"^Mcu\.UserName=(.+)$", content, re.M)
     pkg = re.search(r"^Mcu\.Package=(.+)$", content, re.M)
-    mcu_name = (mcu.group(1) if mcu else "STM32G474CEUx").strip()
-    package = (pkg.group(1) if pkg else "UFQFPN48").strip()
+    mcu_name = (mcu.group(1) if mcu else "STM32H743VITx").strip()
+    package = (pkg.group(1) if pkg else "LQFP100").strip()
 
     pins = load_pins(ioc, package)
     SVG_OUT.parent.mkdir(parents=True, exist_ok=True)
