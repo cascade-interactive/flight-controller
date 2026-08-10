@@ -13,6 +13,9 @@ A quadcopter flight controller I'm building from scratch, firmware and hardware 
 
 > To see the full build log go to my site: [alexanderbugar.com](https://alexanderbugar.com)
 
+> [!IMPORTANT]
+> **Looking for the actual drivers?** They're on the [`legacy/lynn-fc`](../../tree/legacy/lynn-fc) branch, not here. `master` is currently just the regenerated CubeMX skeleton for the new STM32H743 board, so the ICM-20602 SPI driver, the 1 ms DMA IMU loop, the math utilities and the EKF all still live over there on the G4. That's also the branch I'm actively developing on. Once the custom board is up and running, the flight code ports over to this one.
+
 ## Where it's at
 
 Right now it's in the bring-up and estimator phase, running on a **WeAct STM32G474** breadboard with an **ICM-20602**, since that's what I had on hand to prototype with. The custom PCB it's actually meant to run on is a separate project, and once that board arrives the firmware ports over to it.
@@ -30,6 +33,8 @@ The other one was finally having automated tests instead of flashing firmware an
 - Deterministic 1 ms DMA-driven IMU loop
 - Vector and quaternion math utilities
 - EKF first revision + passing unit tests (Google Test)
+
+Everything below the USB CDC line is on [`legacy/lynn-fc`](../../tree/legacy/lynn-fc), not on `master`. `master` carries the H743 CubeMX project, FreeRTOS, FatFS and the USB stack, and that's it for now, since the flight code follows the board rather than leading it.
 
 **In progress**
 
@@ -84,7 +89,7 @@ Part of me still feels like I'm finding reasons not to order the board, but at s
 | `documentation/` | The pinout diagram and other docs                                   |
 | `tools/`         | Small helper scripts for the repo                                   |
 
-The old STM32G4 firmware from before the restructure is preserved on the [`legacy/lynn-fc`](../../tree/legacy/lynn-fc) branch.
+The STM32G4 firmware from before the restructure is on the [`legacy/lynn-fc`](../../tree/legacy/lynn-fc) branch. Despite the `legacy/` prefix it isn't an archive yet: the drivers, the IMU loop and the EKF are there and nowhere else, and it's what I'm still flashing to the breadboard while the H743 board gets finished.
 The previous STM32G474CEU6 board configuration is preserved on the [`legacy/g474ceu`](../../tree/legacy/g474ceu) branch.
 The previous STM32G474RET6 board configuration is preserved on the [`legacy/g474ret`](../../tree/legacy/g474ret) branch.
 
